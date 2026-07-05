@@ -1,0 +1,9 @@
+{
+  "appId": "com.trendelaspalabras.caa",
+  "appName": "El Tren de las Palabras",
+  "webDir": "www",
+  "backgroundColor": "#ffffff",
+  "android": {
+    "allowMixedContent": false
+  }
+}
