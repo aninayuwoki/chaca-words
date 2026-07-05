@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Tren de las Palabras — Comunicador y Juego con Pictogramas</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>🚂 El Tren de las Palabras</h1>
+  <nav class="tabs">
+    <button class="tab-btn activo" data-tab="comunicador">💬 Comunicador</button>
+    <button class="tab-btn" data-tab="abecedario">🔤 Abecedario</button>
+    <button class="tab-btn" data-tab="juego">🎮 Juego</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ==================== VISTA: COMUNICADOR ==================== -->
+  <section id="vista-comunicador" class="vista">
+
+    <section class="phrase-builder">
+      <div id="phrase-container" class="phrase-container"></div>
+      <div class="controls">
+        <button id="btn-speak" class="btn primary" disabled>🔊 Leer frase</button>
+        <button id="btn-clear" class="btn danger">🗑️ Vaciar tren</button>
+      </div>
+    </section>
+
+    <section class="buscador-vocabulario">
+      <h2>🔍 ¿No encuentras una palabra?</h2>
+      <p class="ayuda">Escribe cualquier palabra y la buscamos en el banco de pictogramas ARASAAC para agregarla a tu catálogo.</p>
+      <div class="buscador-fila">
+        <input type="text" id="busqueda-palabra" placeholder="Ej: perro, parque, doctor..." aria-label="Buscar nueva palabra">
+        <select id="busqueda-categoria" aria-label="Categoría para la nueva palabra">
+          <option value="subjects">Personas</option>
+          <option value="verbs">Acciones</option>
+          <option value="objects" selected>Cosas</option>
+          <option value="descriptors">Cómo me siento</option>
+          <option value="social">Para conversar</option>
+        </select>
+        <button id="btn-buscar-palabra" class="btn secondary">Buscar</button>
+      </div>
+      <div id="resultado-busqueda"></div>
+    </section>
+
+    <section class="pictogram-catalog">
+      <div class="category">
+        <h2>🧑 Personas</h2>
+        <div id="grid-subjects" class="picto-grid"></div>
+      </div>
+      <div class="category">
+        <h2>🏃 Acciones</h2>
+        <div id="grid-verbs" class="picto-grid"></div>
+      </div>
+      <div class="category">
+        <h2>🎒 Cosas</h2>
+        <div id="grid-objects" class="picto-grid"></div>
+      </div>
+      <div class="category">
+        <h2>💛 Cómo me siento</h2>
+        <div id="grid-descriptors" class="picto-grid"></div>
+      </div>
+      <div class="category">
+        <h2>💬 Para conversar</h2>
+        <div id="grid-social" class="picto-grid"></div>
+      </div>
+    </section>
+
+  </section>
+
+  <!-- ==================== VISTA: ABECEDARIO ==================== -->
+  <section id="vista-abecedario" class="vista oculto">
+    <p class="instruccion abecedario-intro">Toca una letra para escucharla y descubrir palabras que empiezan con ella.</p>
+    <div class="letras-grid" id="grid-letras"></div>
+    <div class="panel-letra oculto" id="panel-letra"></div>
+  </section>
+
+  <!-- ==================== VISTA: JUEGO ==================== -->
+  <section id="vista-juego" class="vista oculto">
+
+    <div class="juego-encabezado">
+      <div class="estrellas-marcador">⭐ <span id="contador-estrellas">0</span> estrellas</div>
+      <div class="lista-insignias" id="lista-insignias"></div>
+    </div>
+
+    <div class="mapa-estaciones" id="mapa-estaciones"></div>
+
+    <div class="panel-minijuego oculto" id="panel-minijuego"></div>
+
+  </section>
+
+</main>
+
+<footer>
+  Pictogramas cortesía de <a href="https://arasaac.org" target="_blank" rel="noopener">ARASAAC</a>
+  (Gobierno de Aragón · autor Sergio Palao) — licencia CC BY-NC-SA.
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/tts.js"></script>
+<script src="js/arasaac.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/communicator.js"></script>
+<script src="js/alphabet.js"></script>
+<script src="js/game.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
