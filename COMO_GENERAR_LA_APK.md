@@ -67,14 +67,17 @@ cd android
    Capacitor. Cuando tengas un ícono propio, `npx cap` tiene un
    generador (`@capacitor/assets`) que te lo reparte en todas las
    resoluciones automáticamente.
-2. **Voz (Web Speech API)**: en el navegador de escritorio funciona
-   siempre; en el WebView de Android depende del motor TTS instalado
-   en el celular (Google TTS suele venir de fábrica). Si en algún
-   dispositivo no habla, es cuestión de instalar/activar
-   "Síntesis de voz de Google" en Ajustes del sistema — no es un bug
-   de la app. Si más adelante quieres que sea 100% confiable sin
-   depender de eso, hay un plugin nativo
-   (`@capacitor-community/text-to-speech`) que te puedo integrar.
+2. **Voz**: la app usa el plugin nativo
+   `@capacitor-community/text-to-speech`, que habla con el motor TTS
+   real de Android (el mismo que usan TalkBack y el Lector de Google),
+   en vez de depender del Web Speech API del WebView, que en muchos
+   dispositivos Android no trae voces instaladas y se queda mudo sin
+   avisar. `npm install` + `npx cap sync android` (ya están en el
+   workflow de GitHub Actions) instalan y registran el plugin
+   automáticamente, no hace falta tocar nada más. Si por algún motivo
+   el plugin nativo no está disponible (por ejemplo si abres `www/`
+   directo en un navegador de escritorio), la app cae sola al Web
+   Speech API de siempre — no depende de una sola vía.
 3. **Sin conexión**: la primera vez que carga cada palabra necesita
    internet para traer el pictograma de ARASAAC; después queda
    cacheada en `localStorage` y funciona offline. Si vas a usarla en

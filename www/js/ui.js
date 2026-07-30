@@ -53,7 +53,11 @@ function crearTarjetaPictograma(entry, catKey, opts = {}) {
   buscarPictograma(entry.keyword || entry.word).then((res) => {
     if (res && res.url) {
       const tmp = new Image();
-      tmp.onload = () => { img.src = res.url; };
+      tmp.onload = () => {
+        img.style.opacity = '0';
+        img.src = res.url;
+        requestAnimationFrame(() => { img.style.opacity = '1'; });
+      };
       tmp.onerror = () => { /* se queda con el placeholder */ };
       tmp.src = res.url;
     }

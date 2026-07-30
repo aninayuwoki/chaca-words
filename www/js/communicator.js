@@ -78,18 +78,14 @@ function renderizarTren() {
   });
 }
 
-function leerFrase() {
+async function leerFrase() {
   if (fraseActual.length === 0) return;
   const texto = fraseActual.map((p) => p.word).join(' ');
-  const voz = new SpeechSynthesisUtterance(texto);
-  voz.lang = 'es-ES';
-  voz.rate = 0.92;
-  voz.pitch = 1;
 
   const tren = document.getElementById('phrase-container');
   tren.classList.add('tren-en-marcha');
-  window.speechSynthesis.speak(voz);
-  voz.onend = () => tren.classList.remove('tren-en-marcha');
+  await hablar(texto, 0.92);
+  tren.classList.remove('tren-en-marcha');
 
   // El modo Juego también cuenta las frases habladas como práctica.
   if (typeof registrarFraseComunicada === 'function') registrarFraseComunicada(fraseActual.length);
@@ -120,6 +116,15 @@ async function buscarYMostrarResultadoPersonalizado() {
 
   const catKey = categoriaSelect.value;
   const entry = { id: `custom-${Date.now()}`, word: palabra.charAt(0).toUpperCase() + palabra.slice(1), keyword: palabra };
+
+  const yaExiste = VOCABULARY[catKey].some(
+    (existente) => existente.word.trim().toLowerCase() === entry.word.trim().toLowerCase()
+  );
+  if (yaExiste) {
+    resultadoBox.innerHTML = `<p class="sin-resultado">"${entry.word}" ya está en tu catálogo de "${CATEGORIES[catKey].label}".</p>`;
+    return;
+  }
+
   const tarjeta = crearTarjetaPictograma(entry, catKey, {});
   resultadoBox.appendChild(tarjeta);
 
@@ -129,12 +134,21 @@ async function buscarYMostrarResultadoPersonalizado() {
   btnAgregar.addEventListener('click', () => {
     VOCABULARY[catKey].push(entry);
     guardarPalabraPersonalizada(catKey, entry);
-    renderizarCatalogo();
+    agregarTarjetaAlCatalogo(entry, catKey);
     mostrarAviso(`"${entry.word}" se agregó a tu catálogo`, 'exito');
     input.value = '';
     resultadoBox.innerHTML = '';
   });
   resultadoBox.appendChild(btnAgregar);
+}
+
+/** Agrega solo la tarjeta nueva a su grilla, en vez de reconstruir todo
+ * el catálogo (lo que antes volvía a pedir cada pictograma existente
+ * y provocaba un parpadeo visible cada vez que se agregaba 1 palabra). */
+function agregarTarjetaAlCatalogo(entry, catKey) {
+  const grid = document.getElementById(`grid-${catKey}`);
+  if (!grid) return;
+  grid.appendChild(crearTarjetaPictograma(entry, catKey, { clickable: true, onClick: (e) => agregarAFrase(e, catKey) }));
 }
 
 function iniciarComunicador() {

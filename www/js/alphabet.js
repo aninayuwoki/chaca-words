@@ -40,12 +40,7 @@ const ALPHABET = [
 ];
 
 function hablarTexto(texto, rate = 0.9) {
-  if (!('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel();
-  const voz = new SpeechSynthesisUtterance(texto);
-  voz.lang = 'es-ES';
-  voz.rate = rate;
-  window.speechSynthesis.speak(voz);
+  hablar(texto, rate);
 }
 
 function renderizarGrillaLetras() {

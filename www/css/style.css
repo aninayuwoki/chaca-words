@@ -57,11 +57,24 @@ button { font-family: inherit; }
 
 .oculto { display: none !important; }
 
+.vista {
+  animation: aparecer 0.28s ease;
+}
+
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vista { animation: none; }
+}
+
 /* =========================================================
    ENCABEZADO Y PESTAÑAS
    ========================================================= */
 .app-header {
-  background: var(--bg-panel);
+  background: linear-gradient(160deg, var(--bg-panel) 0%, var(--bg-panel) 60%, #eafaf8 100%);
   padding: 18px 20px 0;
   box-shadow: var(--shadow-soft);
   position: sticky;
@@ -75,6 +88,20 @@ button { font-family: inherit; }
   text-align: center;
   color: var(--ink);
   margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.app-header h1 .tren-emoji {
+  display: inline-block;
+  animation: flotar 2.6s ease-in-out infinite;
+}
+
+@keyframes flotar {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-3px) rotate(-3deg); }
 }
 
 .tabs {
@@ -97,7 +124,10 @@ button { font-family: inherit; }
   border-bottom: 4px solid transparent;
   cursor: pointer;
   border-radius: var(--radius-md) var(--radius-md) 0 0;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
+
+.tab-btn:hover { color: var(--ink); background: #f4f7fc; }
 
 .tab-btn.activo {
   color: var(--accent-dark);
@@ -165,14 +195,18 @@ main {
   border-radius: var(--radius-md);
   cursor: pointer;
   font-weight: 700;
-  transition: transform 0.1s ease, opacity 0.15s ease;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.12s ease, opacity 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
-.btn:active { transform: scale(0.96); }
-.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(43,46,74,0.16); }
+.btn:active:not(:disabled) { transform: scale(0.96) translateY(0); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
 .btn.primary { background: var(--accent); color: white; }
 .btn.primary:hover:not(:disabled) { background: var(--accent-dark); }
 .btn.danger { background: var(--danger); color: white; }
+.btn.danger:hover:not(:disabled) { background: #e85555; }
 .btn.secondary { background: #e7ecf5; color: var(--ink); }
+.btn.secondary:hover:not(:disabled) { background: #dbe3f2; }
 
 /* =========================================================
    BÚSQUEDA DE VOCABULARIO NUEVO
@@ -246,10 +280,10 @@ main {
   gap: 6px;
 }
 
-.picto-card:hover:not(:disabled) { transform: translateY(-4px); box-shadow: 0 10px 16px rgba(43,46,74,0.14); }
+.picto-card:hover:not(:disabled) { transform: translateY(-4px) scale(1.02); box-shadow: 0 10px 18px rgba(43,46,74,0.16); }
 .picto-card:disabled { cursor: default; }
 
-.picto-card img { width: 76px; height: 76px; object-fit: contain; border-radius: 8px; background: #f4f6fb; }
+.picto-card img { width: 76px; height: 76px; object-fit: contain; border-radius: 8px; background: #f4f6fb; transition: opacity 0.25s ease; }
 .picto-card p { font-weight: 700; font-size: 0.95rem; }
 
 .picto-small img { width: 52px; height: 52px; }
@@ -267,7 +301,7 @@ main {
 }
 .picto-card.vagon:last-child::after { content: ''; }
 
-.picto-card.correcta { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(31,182,171,0.25); }
+.picto-card.correcta { border-color: var(--accent); background: #eafaf8; box-shadow: 0 0 0 3px rgba(31,182,171,0.25); opacity: 0.85; }
 .picto-card.incorrecta { animation: sacudir 0.35s; border-color: var(--danger); }
 @keyframes sacudir {
   0%, 100% { transform: translateX(0); }
@@ -392,10 +426,10 @@ main {
   text-align: center;
   transition: transform 0.15s ease;
 }
-.estacion-card:hover:not(:disabled) { transform: translateY(-4px); }
+.estacion-card:hover:not(:disabled) { transform: translateY(-4px); box-shadow: 0 10px 18px rgba(43,46,74,0.16); }
 .estacion-card:disabled { opacity: 0.55; cursor: not-allowed; }
 .estacion-card.bloqueada { background: #eef1f6; }
-.estacion-card.completada { box-shadow: 0 0 0 3px var(--accent), var(--shadow-soft); }
+.estacion-card.completada { box-shadow: 0 0 0 3px var(--accent), var(--shadow-soft); background: #eafaf8; }
 
 .estacion-icono { font-size: 2.2rem; }
 .estacion-nombre { font-family: var(--font-display); font-weight: 700; }
