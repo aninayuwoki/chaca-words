@@ -17,6 +17,8 @@ function progresoInicial() {
     stationsCompleted: [],
     badgesEarned: [],
     perfectMemoryGames: 0,
+    perfectListenGames: 0,
+    perfectIntrusoGames: 0,
     phrasesBuilt: 0
   };
 }
@@ -154,6 +156,8 @@ function abrirEstacion(estacion) {
   if (estacion.gameType === 'match') iniciarJuegoEmparejar(estacion, area);
   else if (estacion.gameType === 'memory') iniciarJuegoMemoria(estacion, area);
   else if (estacion.gameType === 'phrase') iniciarJuegoFrases(estacion, area);
+  else if (estacion.gameType === 'listen') iniciarJuegoEscuchar(estacion, area);
+  else if (estacion.gameType === 'intruso') iniciarJuegoIntruso(estacion, area);
 }
 
 /* ---------- Mini-juego 1: Emparejar palabra con pictograma ---------- */
@@ -348,6 +352,120 @@ function iniciarJuegoFrases(estacion, area) {
   }
 
   render();
+}
+
+/* ---------- Mini-juego 4: Escucha y Elige ---------- */
+function iniciarJuegoEscuchar(estacion, area) {
+  const palabras = mezclar(VOCABULARY[estacion.category]).slice(0, 6);
+  let indice = 0;
+  let huboError = false;
+
+  function ronda() {
+    if (indice >= palabras.length) {
+      if (!huboError) progreso.perfectListenGames++;
+      guardarProgreso();
+      marcarEstacionCompleta(estacion);
+      return;
+    }
+
+    const objetivo = palabras[indice];
+    const distractores = mezclar(VOCABULARY[estacion.category])
+      .filter((p) => p.id !== objetivo.id)
+      .slice(0, 2);
+    const opciones = mezclar([objetivo, ...distractores]);
+
+    area.innerHTML = `
+      <p class="instruccion">Escucha la palabra y toca el pictograma correcto.</p>
+      <button type="button" class="btn secondary" id="btn-repetir-audio">🔊 Escuchar de nuevo</button>
+      <div class="picto-grid escuchar-grid" id="escuchar-grid"></div>
+      <p class="ronda-info">Ronda ${indice + 1} de ${palabras.length}</p>
+    `;
+
+    const grid = area.querySelector('#escuchar-grid');
+    const btnRepetir = area.querySelector('#btn-repetir-audio');
+    const reproducirPalabra = () => hablar(objetivo.word, 0.85);
+
+    opciones.forEach((op) => {
+      const tarjeta = crearTarjetaPictograma(op, estacion.category, {
+        clickable: true,
+        onClick: () => {
+          if (op.id === objetivo.id) {
+            tarjeta.classList.add('correcta');
+            reproducirSonido('acierto');
+            grid.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+            indice++;
+            setTimeout(ronda, 550);
+          } else {
+            huboError = true;
+            tarjeta.classList.add('incorrecta');
+            reproducirSonido('error');
+            setTimeout(() => tarjeta.classList.remove('incorrecta'), 400);
+          }
+        }
+      });
+      grid.appendChild(tarjeta);
+    });
+
+    btnRepetir.addEventListener('click', reproducirPalabra);
+    reproducirPalabra();
+  }
+
+  ronda();
+}
+
+/* ---------- Mini-juego 5: Encuentra el Intruso ---------- */
+function iniciarJuegoIntruso(estacion, area) {
+  const categoriasDisponibles = Object.keys(VOCABULARY).filter((c) => c !== estacion.category);
+  const totalRondas = 5;
+  let ronda = 0;
+  let huboError = false;
+
+  function nuevaRonda() {
+    if (ronda >= totalRondas) {
+      if (!huboError) progreso.perfectIntrusoGames++;
+      guardarProgreso();
+      marcarEstacionCompleta(estacion);
+      return;
+    }
+
+    const grupo = mezclar(VOCABULARY[estacion.category]).slice(0, 4).map((p) => ({ ...p, catKey: estacion.category }));
+    const catIntruso = categoriasDisponibles[Math.floor(Math.random() * categoriasDisponibles.length)];
+    const intruso = mezclar(VOCABULARY[catIntruso])[0];
+    const intrusoEntry = { ...intruso, catKey: catIntruso };
+
+    const opciones = mezclar([...grupo, intrusoEntry]);
+
+    area.innerHTML = `
+      <p class="instruccion">Toca el pictograma que no pertenece al grupo.</p>
+      <div class="picto-grid intruso-grid" id="intruso-grid"></div>
+      <p class="ronda-info">Ronda ${ronda + 1} de ${totalRondas}</p>
+    `;
+
+    const grid = area.querySelector('#intruso-grid');
+
+    opciones.forEach((op) => {
+      const tarjeta = crearTarjetaPictograma(op, op.catKey, {
+        clickable: true,
+        onClick: () => {
+          if (op.id === intrusoEntry.id) {
+            tarjeta.classList.add('correcta');
+            reproducirSonido('acierto');
+            grid.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+            ronda++;
+            setTimeout(nuevaRonda, 600);
+          } else {
+            huboError = true;
+            tarjeta.classList.add('incorrecta');
+            reproducirSonido('error');
+            setTimeout(() => tarjeta.classList.remove('incorrecta'), 400);
+          }
+        }
+      });
+      grid.appendChild(tarjeta);
+    });
+  }
+
+  nuevaRonda();
 }
 
 function iniciarJuego() {

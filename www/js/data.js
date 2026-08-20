@@ -8,6 +8,19 @@
  * arreglo de la categoría correspondiente. "keyword" es el término que
  * se envía a la API de ARASAAC para buscar el pictograma; si no se
  * indica, se usa "word" en minúsculas.
+ *
+ * CÓMO CORREGIR UN PICTOGRAMA QUE SALE MAL (ej. "Papá" mostraba una
+ * papa/patata): esto pasa porque ARASAAC hace coincidir la palabra con
+ * el mejor resultado de búsqueda y a veces una palabra con tilde
+ * (papá) compite con otra palabra distinta sin tilde (papa) que tiene
+ * un pictograma más "popular". Hay dos formas de arreglarlo en un
+ * objeto de palabra:
+ *   1) "keyword": cambia el término de búsqueda por uno sin ambigüedad
+ *      (ej. la entrada "Papá" busca "padre" en vez de "papá").
+ *   2) "arasaacId": fija directamente el ID del pictograma correcto
+ *      (se salta la búsqueda por completo). Para encontrar el ID entra
+ *      a arasaac.org, busca la palabra, y copia el número que aparece
+ *      en la URL de la imagen (https://static.arasaac.org/pictograms/ID/...).
  */
 
 const CATEGORIES = {
@@ -24,8 +37,8 @@ const VOCABULARY = {
   subjects: [
     { id: 'yo', word: 'Yo' },
     { id: 'tu', word: 'Tú' },
-    { id: 'mama', word: 'Mamá' },
-    { id: 'papa', word: 'Papá' },
+    { id: 'mama', word: 'Mamá', keyword: 'madre' },
+    { id: 'papa', word: 'Papá', keyword: 'padre' },
     { id: 'amigo', word: 'Amigo' },
     { id: 'maestra', word: 'Maestra' }
   ],
@@ -71,7 +84,7 @@ const VOCABULARY = {
  * Cada estación se desbloquea con una cantidad mínima de estrellas
  * acumuladas y practica una categoría con un tipo de mini-juego.
  *
- * gameType: 'memory' | 'match' | 'phrase'
+ * gameType: 'memory' | 'match' | 'phrase' | 'listen' | 'intruso'
  */
 const STATIONS = [
   {
@@ -115,11 +128,27 @@ const STATIONS = [
     description: 'Reconoce cómo se siente cada pictograma.'
   },
   {
+    id: 'estacion-escucha',
+    name: 'Estación Escucha',
+    category: 'subjects',
+    gameType: 'listen',
+    starsToUnlock: 17,
+    description: 'Escucha la palabra y toca el pictograma correcto.'
+  },
+  {
+    id: 'estacion-intrusos',
+    name: 'Estación Intrusos',
+    category: 'verbs',
+    gameType: 'intruso',
+    starsToUnlock: 21,
+    description: 'Toca el pictograma que no pertenece al grupo.'
+  },
+  {
     id: 'estacion-final',
     name: 'Estación Final: Mis Frases',
     category: 'mixed',
     gameType: 'phrase',
-    starsToUnlock: 18,
+    starsToUnlock: 25,
     description: 'Arma frases completas subiendo los vagones correctos al tren.',
     phrases: [
       ['yo', 'querer', 'agua'],
@@ -165,6 +194,20 @@ const BADGES = [
     emoji: '🏅',
     description: 'Desbloqueaste todas las estaciones del tren.',
     check: (p) => p.stationsCompleted.length >= STATIONS.length
+  },
+  {
+    id: 'oido-de-lince',
+    name: 'Oído de Lince',
+    emoji: '👂',
+    description: 'Ganaste la Estación Escucha sin ningún error.',
+    check: (p) => p.perfectListenGames >= 1
+  },
+  {
+    id: 'detective-de-pictogramas',
+    name: 'Detective de Pictogramas',
+    emoji: '🕵️',
+    description: 'Ganaste la Estación Intrusos sin ningún error.',
+    check: (p) => p.perfectIntrusoGames >= 1
   },
   {
     id: 'estrella-fugaz',

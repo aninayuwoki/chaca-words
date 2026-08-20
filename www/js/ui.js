@@ -50,18 +50,33 @@ function crearTarjetaPictograma(entry, catKey, opts = {}) {
   card.appendChild(img);
   card.appendChild(label);
 
-  buscarPictograma(entry.keyword || entry.word).then((res) => {
-    if (res && res.url) {
-      const tmp = new Image();
-      tmp.onload = () => {
-        img.style.opacity = '0';
-        img.src = res.url;
-        requestAnimationFrame(() => { img.style.opacity = '1'; });
-      };
-      tmp.onerror = () => { /* se queda con el placeholder */ };
-      tmp.src = res.url;
-    }
-  });
+  if (entry.arasaacId) {
+    // Pictograma fijado a mano (ver comentario en data.js sobre
+    // "arasaacId"): se salta la búsqueda para garantizar que sea
+    // siempre la imagen correcta, sin depender del buscador de ARASAAC.
+    const urlFija = urlImagenArasaac(entry.arasaacId);
+    const tmp = new Image();
+    tmp.onload = () => {
+      img.style.opacity = '0';
+      img.src = urlFija;
+      requestAnimationFrame(() => { img.style.opacity = '1'; });
+    };
+    tmp.onerror = () => { /* se queda con el placeholder */ };
+    tmp.src = urlFija;
+  } else {
+    buscarPictograma(entry.keyword || entry.word).then((res) => {
+      if (res && res.url) {
+        const tmp = new Image();
+        tmp.onload = () => {
+          img.style.opacity = '0';
+          img.src = res.url;
+          requestAnimationFrame(() => { img.style.opacity = '1'; });
+        };
+        tmp.onerror = () => { /* se queda con el placeholder */ };
+        tmp.src = res.url;
+      }
+    });
+  }
 
   if (clickable && onClick) {
     card.addEventListener('click', () => onClick(entry));

@@ -503,6 +503,10 @@ main {
   display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;
 }
 
+/* --- Escuchar y Elige / Encuentra el Intruso --- */
+#btn-repetir-audio { margin-bottom: 16px; }
+.ronda-info { color: var(--ink-soft); margin-top: 12px; font-weight: 700; }
+
 /* =========================================================
    AVISOS (toast) Y CONFETI
    ========================================================= */
