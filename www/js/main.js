@@ -12,6 +12,7 @@ function cambiarPestana(destino) {
 document.addEventListener('DOMContentLoaded', () => {
   iniciarComunicador();
   iniciarAbecedario();
+  iniciarEscritor();
   iniciarJuego();
 
   document.querySelectorAll('.tab-btn').forEach((btn) => {

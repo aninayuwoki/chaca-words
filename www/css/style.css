@@ -22,6 +22,7 @@
   --c-social: #b98af0;
   --c-neutral: #93a0b3;
   --c-alphabet: #ff6f9c;
+  --c-writer: #ffa64d;
 
   --accent: #1fb6ab;
   --accent-dark: #14847b;
@@ -366,6 +367,54 @@ main {
 
 .panel-letra .picto-grid { justify-content: center; }
 .panel-letra .instruccion { text-align: center; }
+
+/* =========================================================
+   ESCRITOR — TECLADO PARA ARMAR PALABRAS LETRA POR LETRA
+   ========================================================= */
+.escritor-panel {
+  background: var(--bg-panel);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 22px;
+}
+
+.pantalla-escritor {
+  min-height: 76px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  padding: 14px 18px;
+  margin-bottom: 14px;
+  background: #fff8f0;
+  border: 2px solid var(--c-writer);
+}
+
+.texto-escritor {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2rem;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  word-break: break-word;
+}
+
+.cursor-escritor {
+  display: inline-block;
+  width: 3px;
+  height: 2rem;
+  margin-left: 3px;
+  background: var(--c-writer);
+  animation: parpadeo 1s step-start infinite;
+  vertical-align: middle;
+}
+
+@keyframes parpadeo { 50% { opacity: 0; } }
+
+.teclado-escritor .letra-card { border-color: var(--c-writer); }
+.teclado-escritor .letra-card:hover { background: #fff4e6; }
+
+#btn-espacio-escritor { min-width: 110px; }
 
 /* =========================================================
    MODO JUEGO — ENCABEZADO, MAPA DE ESTACIONES E INSIGNIAS

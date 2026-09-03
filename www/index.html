@@ -18,6 +18,7 @@
   <nav class="tabs">
     <button class="tab-btn activo" data-tab="comunicador">💬 Comunicador</button>
     <button class="tab-btn" data-tab="abecedario">🔤 Abecedario</button>
+    <button class="tab-btn" data-tab="escritor">✍️ Escribir</button>
     <button class="tab-btn" data-tab="juego">🎮 Juego</button>
   </nav>
 </header>
@@ -84,6 +85,25 @@
     <div class="panel-letra oculto" id="panel-letra"></div>
   </section>
 
+  <!-- ==================== VISTA: ESCRITOR ==================== -->
+  <section id="vista-escritor" class="vista oculto">
+    <p class="instruccion">Toca las letras para escribir una palabra. Cuando termines, toca "Leer palabra" para escucharla.</p>
+
+    <section class="escritor-panel">
+      <div id="pantalla-escritor" class="pantalla-escritor">
+        <span id="texto-escritor" class="texto-escritor"></span><span class="cursor-escritor" aria-hidden="true"></span>
+      </div>
+      <div class="controls">
+        <button id="btn-leer-palabra" class="btn primary" disabled>🔊 Leer palabra</button>
+        <button id="btn-borrar-letra" class="btn secondary" disabled>⌫ Borrar letra</button>
+        <button id="btn-espacio-escritor" class="btn secondary">␣ Espacio</button>
+        <button id="btn-vaciar-escritor" class="btn danger" disabled>🗑️ Borrar todo</button>
+      </div>
+    </section>
+
+    <div class="letras-grid teclado-escritor" id="teclado-escritor"></div>
+  </section>
+
   <!-- ==================== VISTA: JUEGO ==================== -->
   <section id="vista-juego" class="vista oculto">
 
@@ -111,6 +131,7 @@
 <script src="js/ui.js"></script>
 <script src="js/communicator.js"></script>
 <script src="js/alphabet.js"></script>
+<script src="js/escritor.js"></script>
 <script src="js/game.js"></script>
 <script src="js/main.js"></script>
 </body>
