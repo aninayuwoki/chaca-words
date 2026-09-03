@@ -39,6 +39,39 @@ function urlImagenArasaac(id, size = 500) {
   return `https://static.arasaac.org/pictograms/${id}/${id}_${size}.png`;
 }
 
+async function obtenerListaPictogramas(url) {
+  try {
+    const resp = await fetch(url);
+    if (!resp.ok) return null;
+    const datos = await resp.json();
+    return Array.isArray(datos) && datos.length ? datos : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Busca, dentro de una lista de resultados de la API, un pictograma
+ * cuya palabra clave coincida LITERALMENTE con lo que escribió la
+ * persona (mismas letras, mismas tildes). Esto es necesario porque
+ * el endpoint "bestsearch" de ARASAAC tolera errores de tipeo y, por
+ * esa tolerancia, puede confundir palabras que en español significan
+ * cosas distintas solo por la tilde (ej. "papá" el familiar vs.
+ * "papa" la patata/el Papa). Al exigir coincidencia exacta con lo
+ * que se buscó, esa ambigüedad se resuelve correctamente.
+ */
+function encontrarCoincidenciaExacta(pictogramas, clave) {
+  for (const picto of pictogramas) {
+    if (!Array.isArray(picto.keywords)) continue;
+    const tieneCoincidenciaExacta = picto.keywords.some((k) => {
+      const texto = k && typeof k.keyword === 'string' ? k.keyword.trim().toLowerCase() : '';
+      return texto === clave;
+    });
+    if (tieneCoincidenciaExacta) return picto._id;
+  }
+  return null;
+}
+
 /**
  * Busca el pictograma más adecuado para una palabra.
  * @param {string} keyword - término de búsqueda en español
@@ -56,20 +89,44 @@ async function buscarPictograma(keyword) {
     return resultado;
   }
 
-  try {
-    const resp = await fetch(`https://api.arasaac.org/api/pictograms/es/bestsearch/${encodeURIComponent(clave)}`);
-    if (!resp.ok) throw new Error('respuesta no válida de ARASAAC');
-    const datos = await resp.json();
-    if (!Array.isArray(datos) || datos.length === 0) throw new Error('sin resultados');
-
-    const id = datos[0]._id;
+  const guardarYDevolver = (id) => {
     const resultado = { id, url: urlImagenArasaac(id) };
-
     memoryCache.set(clave, resultado);
     cacheLocal[clave] = id;
     guardarCacheLocal(cacheLocal);
-
     return resultado;
+  };
+
+  try {
+    // 1) Búsqueda literal ("search"): no corrige errores de tipeo, así
+    // que es más confiable para no confundir palabras que solo se
+    // diferencian por una tilde.
+    const resultadosLiteral = await obtenerListaPictogramas(
+      `https://api.arasaac.org/api/pictograms/es/search/${encodeURIComponent(clave)}`
+    );
+    let idElegido = resultadosLiteral && encontrarCoincidenciaExacta(resultadosLiteral, clave);
+
+    if (!idElegido) {
+      // 2) Si ahí no hay una coincidencia exacta, probamos "bestsearch"
+      // (tolera errores de tipeo) pero, otra vez, priorizando entre
+      // SUS resultados la palabra exacta que se escribió, antes de
+      // conformarnos con la primera sugerencia "parecida".
+      const resultadosTolerantes = await obtenerListaPictogramas(
+        `https://api.arasaac.org/api/pictograms/es/bestsearch/${encodeURIComponent(clave)}`
+      );
+      idElegido = resultadosTolerantes && encontrarCoincidenciaExacta(resultadosTolerantes, clave);
+
+      if (!idElegido) {
+        // Ninguna de las dos búsquedas tiene la palabra exacta entre
+        // sus etiquetas: usamos el mejor resultado disponible.
+        const mejorDisponible = (resultadosTolerantes && resultadosTolerantes[0])
+          || (resultadosLiteral && resultadosLiteral[0]);
+        if (!mejorDisponible) throw new Error('sin resultados');
+        idElegido = mejorDisponible._id;
+      }
+    }
+
+    return guardarYDevolver(idElegido);
   } catch (err) {
     console.warn(`No se pudo obtener el pictograma de "${clave}":`, err.message);
     memoryCache.set(clave, null);

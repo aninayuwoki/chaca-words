@@ -40,6 +40,13 @@ const audiosVocales = {};
 // poder pararla al tocar otra vocal o al presionar "Detener".
 let audioVocalActivo = null;
 
+// Si hay una reproducción en curso, esta función permite "resolverla"
+// a la fuerza desde afuera (por ejemplo al tocar "Detener"), porque
+// pausar un <audio> con .pause() NO dispara el evento "ended": sin
+// esto, la función que espera a que termine la canción se quedaba
+// esperando para siempre y la app quedaba bloqueada.
+let resolverReproduccionActual = null;
+
 // Función para detener la animación de trazos del "escenario" (la
 // devuelve iniciarEscenarioLetra, de letras-animadas.js).
 let detenerEscenarioLetra = null;
@@ -119,12 +126,23 @@ function detenerAudioVocalActivo() {
   audioVocalActivo = null;
   VOCALES_CANCION.forEach((entry) => resaltarTarjetaVocal(entry.letter, false));
   ocultarEscenarioVocal();
+
+  // Si algo estaba esperando a que esta canción terminara (el "await"
+  // dentro de reproducirAudioVocal), lo liberamos ahora mismo: de lo
+  // contrario esa espera nunca se resuelve porque .pause() no dispara
+  // el evento "ended", y toda la zona Vocales se queda bloqueada.
+  if (resolverReproduccionActual) {
+    const resolver = resolverReproduccionActual;
+    resolverReproduccionActual = null;
+    resolver();
+  }
 }
 
 /**
  * Reproduce la canción completa de una vocal y devuelve una promesa
  * que se resuelve cuando termina (o cuando falla y ya se dijo el
- * respaldo por voz), para poder encadenarlas en la canción completa.
+ * respaldo por voz, o cuando se detiene manualmente), para poder
+ * encadenarlas en la canción completa.
  */
 function reproducirAudioVocal(entry) {
   return new Promise((resolve) => {
@@ -134,12 +152,16 @@ function reproducirAudioVocal(entry) {
     resaltarTarjetaVocal(entry.letter, true);
     mostrarEscenarioVocal(entry);
 
+    let yaResuelto = false;
     const terminar = () => {
+      if (yaResuelto) return;
+      yaResuelto = true;
       audio.removeEventListener('ended', alTerminar);
       audio.removeEventListener('error', alFallar);
       resaltarTarjetaVocal(entry.letter, false);
       ocultarEscenarioVocal();
       if (audioVocalActivo === audio) audioVocalActivo = null;
+      if (resolverReproduccionActual === terminar) resolverReproduccionActual = null;
       resolve();
     };
     const alTerminar = () => terminar();
@@ -148,6 +170,8 @@ function reproducirAudioVocal(entry) {
       await hablar(`${entry.letter}... de ${entry.word}`, 0.85);
       terminar();
     };
+
+    resolverReproduccionActual = terminar;
 
     audio.addEventListener('ended', alTerminar, { once: true });
     audio.addEventListener('error', alFallar, { once: true });
