@@ -394,6 +394,54 @@ main {
   50% { transform: translateY(-10px) scale(1.08); }
 }
 
+/* ---- Escenario animado (letra dibujándose + palabras) ---- */
+.escenario-vocales {
+  background: var(--bg-panel);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 18px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  border: 3px dashed var(--c-vowel);
+}
+
+.escenario-letra {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.bloque-letra-animada { text-align: center; width: 130px; }
+.bloque-letra-animada p {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin-top: 4px;
+  font-size: 0.85rem;
+}
+
+.svg-letra-animada {
+  width: 120px;
+  height: 120px;
+}
+
+.svg-letra-animada .trazo-letra {
+  fill: none;
+  stroke: var(--c-vowel);
+  stroke-width: 16;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.escenario-palabras { display: flex; justify-content: center; }
+.escenario-palabras .picto-card { cursor: default; }
+.escenario-palabras .picto-card:hover { transform: none; box-shadow: var(--shadow-soft); }
+
 /* =========================================================
    ESCRITOR — TECLADO PARA ARMAR PALABRAS LETRA POR LETRA
    ========================================================= */

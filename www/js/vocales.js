@@ -21,11 +21,16 @@
  */
 
 const VOCALES_CANCION = [
-  { letter: 'A', id: 'arbol', word: 'Árbol', audio: 'assets/audio/vocal-a.mp3' },
-  { letter: 'E', id: 'escuela', word: 'Escuela', audio: 'assets/audio/vocal-e.mp3' },
-  { letter: 'I', id: 'iglesia', word: 'Iglesia', audio: 'assets/audio/vocal-i.mp3' },
-  { letter: 'O', id: 'oso', word: 'Oso', audio: 'assets/audio/vocal-o.mp3' },
-  { letter: 'U', id: 'uva', word: 'Uva', audio: 'assets/audio/vocal-u.mp3' }
+  { letter: 'A', id: 'arbol', word: 'Árbol', audio: 'assets/audio/vocal-a.mp3',
+    palabras: [{ id: 'abeja', word: 'Abeja' }, { id: 'agua-abc', word: 'Agua' }, { id: 'arbol', word: 'Árbol' }, { id: 'amigo-abc', word: 'Amigo' }] },
+  { letter: 'E', id: 'escuela', word: 'Escuela', audio: 'assets/audio/vocal-e.mp3',
+    palabras: [{ id: 'elefante', word: 'Elefante' }, { id: 'escuela', word: 'Escuela' }, { id: 'estrella', word: 'Estrella' }, { id: 'espejo', word: 'Espejo' }] },
+  { letter: 'I', id: 'iglesia', word: 'Iglesia', audio: 'assets/audio/vocal-i.mp3',
+    palabras: [{ id: 'insecto', word: 'Insecto' }, { id: 'isla', word: 'Isla' }, { id: 'iguana-vocales', word: 'Iguana', keyword: 'iguana' }, { id: 'iglesia', word: 'Iglesia' }] },
+  { letter: 'O', id: 'oso', word: 'Oso', audio: 'assets/audio/vocal-o.mp3',
+    palabras: [{ id: 'oso', word: 'Oso' }, { id: 'oveja', word: 'Oveja' }, { id: 'ojo', word: 'Ojo' }, { id: 'oreja', word: 'Oreja' }] },
+  { letter: 'U', id: 'uva', word: 'Uva', audio: 'assets/audio/vocal-u.mp3',
+    palabras: [{ id: 'unicornio', word: 'Unicornio' }, { id: 'uva', word: 'Uva' }, { id: 'urraca-vocales', word: 'Urraca', keyword: 'urraca' }] }
 ];
 
 // Un <audio> reutilizable por vocal (se crea una sola vez al iniciar).
@@ -34,6 +39,13 @@ const audiosVocales = {};
 // La canción que está sonando en este momento, si hay alguna, para
 // poder pararla al tocar otra vocal o al presionar "Detener".
 let audioVocalActivo = null;
+
+// Función para detener la animación de trazos del "escenario" (la
+// devuelve iniciarEscenarioLetra, de letras-animadas.js).
+let detenerEscenarioLetra = null;
+
+// Temporizador del carrusel de palabras del escenario.
+let temporizadorPalabrasEscenario = null;
 
 let cancionVocalesActiva = false;
 let cancelarCancionVocales = false;
@@ -45,6 +57,50 @@ function pausaMs(ms) {
 function resaltarTarjetaVocal(letra, activar) {
   const tarjeta = document.getElementById(`vocal-card-${letra}`);
   if (tarjeta) tarjeta.classList.toggle('activa', activar);
+}
+
+/** Arranca el escenario animado (letra dibujándose + carrusel de
+ * palabras) para la vocal que empieza a sonar. */
+function mostrarEscenarioVocal(entry) {
+  ocultarEscenarioVocal();
+
+  const panel = document.getElementById('escenario-vocales');
+  panel.classList.remove('oculto');
+
+  const contenedorLetra = document.getElementById('escenario-letra');
+  detenerEscenarioLetra = iniciarEscenarioLetra(contenedorLetra, entry.letter);
+
+  const contenedorPalabras = document.getElementById('escenario-palabras');
+  contenedorPalabras.innerHTML = '';
+  const palabras = entry.palabras && entry.palabras.length ? entry.palabras : [entry];
+  let indice = 0;
+
+  function mostrarSiguientePalabra() {
+    contenedorPalabras.innerHTML = '';
+    const tarjeta = crearTarjetaPictograma(palabras[indice], 'vowels', { size: 'small' });
+    contenedorPalabras.appendChild(tarjeta);
+    indice = (indice + 1) % palabras.length;
+  }
+
+  mostrarSiguientePalabra();
+  temporizadorPalabrasEscenario = setInterval(mostrarSiguientePalabra, 2200);
+}
+
+/** Apaga el escenario animado (se llama al terminar, fallar o
+ * detener una canción). */
+function ocultarEscenarioVocal() {
+  if (detenerEscenarioLetra) {
+    detenerEscenarioLetra();
+    detenerEscenarioLetra = null;
+  }
+  if (temporizadorPalabrasEscenario) {
+    clearInterval(temporizadorPalabrasEscenario);
+    temporizadorPalabrasEscenario = null;
+  }
+  const panel = document.getElementById('escenario-vocales');
+  if (panel) panel.classList.add('oculto');
+  const contenedorPalabras = document.getElementById('escenario-palabras');
+  if (contenedorPalabras) contenedorPalabras.innerHTML = '';
 }
 
 function crearAudiosVocales() {
@@ -62,6 +118,7 @@ function detenerAudioVocalActivo() {
   }
   audioVocalActivo = null;
   VOCALES_CANCION.forEach((entry) => resaltarTarjetaVocal(entry.letter, false));
+  ocultarEscenarioVocal();
 }
 
 /**
@@ -75,11 +132,13 @@ function reproducirAudioVocal(entry) {
     const audio = audiosVocales[entry.letter];
     audioVocalActivo = audio;
     resaltarTarjetaVocal(entry.letter, true);
+    mostrarEscenarioVocal(entry);
 
     const terminar = () => {
       audio.removeEventListener('ended', alTerminar);
       audio.removeEventListener('error', alFallar);
       resaltarTarjetaVocal(entry.letter, false);
+      ocultarEscenarioVocal();
       if (audioVocalActivo === audio) audioVocalActivo = null;
       resolve();
     };
