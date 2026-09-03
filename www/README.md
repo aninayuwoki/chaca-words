@@ -19,7 +19,8 @@ comunicador-pictogramas/
 │   ├── communicator.js       → modo Comunicador (tren de frases + búsqueda)
 │   ├── game.js                 → modo Juego (mapa de estaciones + minijuegos)
 │   └── main.js                  → arranque de la app y cambio de pestañas
-└── assets/                      → carpeta libre para íconos propios futuros
+└── assets/
+    └── audio/                    → los 5 MP3 de la canción de las vocales
 ```
 
 Cada archivo tiene una única responsabilidad, así que si en el futuro
@@ -53,6 +54,29 @@ escuchar la palabra completa. El vocabulario de cada letra vive en
 `js/alphabet.js`, en el arreglo `ALPHABET` — agregar una palabra es
 tan simple como sumar `{ id: 'algo', word: 'Palabra' }` al arreglo
 `words` de la letra correspondiente.
+
+## Zona Vocales
+
+Una pestaña con una canción por cada una de las 5 vocales. Al tocar
+una vocal suena su canción completa en MP3; el botón "Cantar la
+canción de las vocales" las reproduce las 5 seguidas.
+
+**Los archivos de audio van en `www/assets/audio/`, con estos
+nombres exactos (minúsculas, sin tildes ni espacios):**
+
+| Vocal | Archivo |
+|---|---|
+| A | `assets/audio/vocal-a.mp3` |
+| E | `assets/audio/vocal-e.mp3` |
+| I | `assets/audio/vocal-i.mp3` |
+| O | `assets/audio/vocal-o.mp3` |
+| U | `assets/audio/vocal-u.mp3` |
+
+Solo hace falta copiar los 5 MP3 con esos nombres dentro de esa
+carpeta y volver a generar el APK (o el build de GitHub Actions); el
+código ya los busca ahí (`js/vocales.js`). Si algún archivo falta o
+no carga, esa vocal cae automáticamente a la voz de la app diciendo
+la vocal y una palabra de ejemplo, para que nunca se quede muda.
 
 ## Modo Comunicador
 

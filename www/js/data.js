@@ -30,7 +30,8 @@ const CATEGORIES = {
   descriptors: { label: 'Cómo me siento', varName: '--c-descriptor', icon: '💛' },
   social: { label: 'Para conversar', varName: '--c-social', icon: '💬' },
   mixed: { label: 'Mis frases', varName: '--c-neutral', icon: '🚂' },
-  alphabet: { label: 'Abecedario', varName: '--c-alphabet', icon: '🔤' }
+  alphabet: { label: 'Abecedario', varName: '--c-alphabet', icon: '🔤' },
+  vowels: { label: 'Vocales', varName: '--c-vowel', icon: '🎵' }
 };
 
 const VOCABULARY = {

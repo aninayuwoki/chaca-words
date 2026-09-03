@@ -18,6 +18,7 @@
   <nav class="tabs">
     <button class="tab-btn activo" data-tab="comunicador">💬 Comunicador</button>
     <button class="tab-btn" data-tab="abecedario">🔤 Abecedario</button>
+    <button class="tab-btn" data-tab="vocales">🎵 Vocales</button>
     <button class="tab-btn" data-tab="escritor">✍️ Escribir</button>
     <button class="tab-btn" data-tab="juego">🎮 Juego</button>
   </nav>
@@ -85,6 +86,15 @@
     <div class="panel-letra oculto" id="panel-letra"></div>
   </section>
 
+  <!-- ==================== VISTA: VOCALES ==================== -->
+  <section id="vista-vocales" class="vista oculto">
+    <p class="instruccion">Toca "Cantar" para aprender las vocales con una cancioncita animada, o toca cada vocal para escucharla sola.</p>
+    <div class="vocales-controles">
+      <button id="btn-cantar-vocales" class="btn primary">🎵 Cantar la canción de las vocales</button>
+    </div>
+    <div class="vocales-grid" id="grid-vocales"></div>
+  </section>
+
   <!-- ==================== VISTA: ESCRITOR ==================== -->
   <section id="vista-escritor" class="vista oculto">
     <p class="instruccion">Toca las letras para escribir una palabra. Cuando termines, toca "Leer palabra" para escucharla.</p>
@@ -131,6 +141,7 @@
 <script src="js/ui.js"></script>
 <script src="js/communicator.js"></script>
 <script src="js/alphabet.js"></script>
+<script src="js/vocales.js"></script>
 <script src="js/escritor.js"></script>
 <script src="js/game.js"></script>
 <script src="js/main.js"></script>

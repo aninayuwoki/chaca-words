@@ -68,3 +68,16 @@ async function hablar(texto, rate = 0.92) {
   }
   await hablarConWebSpeech(texto, rate);
 }
+
+/** Detiene cualquier lectura en curso (nativa o del navegador). Se
+ * usa, por ejemplo, para poder "pausar" a mitad de la canción de las
+ * vocales cuando el niño o niña toca "Detener". */
+function detenerHabla() {
+  const nativo = obtenerPluginTTSNativo();
+  if (nativo && typeof nativo.stop === 'function') {
+    nativo.stop().catch(() => { /* nada que hacer si falla */ });
+  }
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+}

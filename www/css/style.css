@@ -23,6 +23,7 @@
   --c-neutral: #93a0b3;
   --c-alphabet: #ff6f9c;
   --c-writer: #ffa64d;
+  --c-vowel: #7c5cff;
 
   --accent: #1fb6ab;
   --accent-dark: #14847b;
@@ -367,6 +368,31 @@ main {
 
 .panel-letra .picto-grid { justify-content: center; }
 .panel-letra .instruccion { text-align: center; }
+
+/* =========================================================
+   VOCALES — CANCIÓN ANIMADA
+   ========================================================= */
+.vocales-controles { display: flex; justify-content: center; margin-bottom: 20px; }
+
+.vocales-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+.vocal-card { border-width: 4px; }
+.vocal-card img { width: 90px; height: 90px; }
+.vocal-card p { font-size: 1.4rem; font-family: var(--font-display); font-weight: 800; }
+
+.vocal-card.activa {
+  animation: rebotar-vocal 0.5s ease infinite;
+  box-shadow: 0 0 0 5px rgba(124, 92, 255, 0.3), 0 10px 18px rgba(43,46,74,0.2);
+}
+
+@keyframes rebotar-vocal {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-10px) scale(1.08); }
+}
 
 /* =========================================================
    ESCRITOR — TECLADO PARA ARMAR PALABRAS LETRA POR LETRA

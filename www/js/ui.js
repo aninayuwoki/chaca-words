@@ -153,3 +153,25 @@ function reproducirSonido(tipo) {
     /* Web Audio no disponible: no pasa nada, la app sigue funcionando */
   }
 }
+
+/** Toca una sola nota musical (Web Audio API), usada por la
+ * "canción de las vocales" para acompañar cada vocal con un sonido
+ * alegre sin depender de archivos de audio externos. */
+function tocarNotaMusical(frecuencia, duracion = 0.35) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(frecuencia, ctx.currentTime);
+    gain.gain.setValueAtTime(0.09, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duracion);
+    osc.start();
+    osc.stop(ctx.currentTime + duracion + 0.05);
+  } catch {
+    /* Web Audio no disponible: no pasa nada, la app sigue funcionando */
+  }
+}
