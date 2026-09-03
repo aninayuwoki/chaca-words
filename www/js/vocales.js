@@ -124,7 +124,10 @@ function detenerAudioVocalActivo() {
     audioVocalActivo.currentTime = 0;
   }
   audioVocalActivo = null;
-  VOCALES_CANCION.forEach((entry) => resaltarTarjetaVocal(entry.letter, false));
+  VOCALES_CANCION.forEach((entry) => {
+    resaltarTarjetaVocal(entry.letter, false);
+    marcarTarjetaVocalPausada(entry.letter, false);
+  });
   ocultarEscenarioVocal();
 
   // Si algo estaba esperando a que esta canción terminara (el "await"
@@ -136,6 +139,33 @@ function detenerAudioVocalActivo() {
     resolverReproduccionActual = null;
     resolver();
   }
+}
+
+function marcarTarjetaVocalPausada(letra, pausada) {
+  const tarjeta = document.getElementById(`vocal-card-${letra}`);
+  if (tarjeta) tarjeta.classList.toggle('pausada', pausada);
+}
+
+/** Pausa la canción que está sonando ahora mismo SIN reiniciarla ni
+ * darla por terminada: el audio se queda a la mitad, listo para
+ * retomarse justo donde iba con reanudarVocalActual(). A diferencia
+ * de detenerAudioVocalActivo(), esta función no libera la promesa
+ * pendiente de reproducirAudioVocal — la canción sigue "en pausa",
+ * no "terminada". */
+function pausarVocalActual(entry) {
+  if (audioVocalActivo) audioVocalActivo.pause();
+  resaltarTarjetaVocal(entry.letter, false);
+  marcarTarjetaVocalPausada(entry.letter, true);
+  ocultarEscenarioVocal();
+}
+
+/** Retoma, desde donde se quedó, la canción de la vocal que ya se
+ * había empezado a reproducir y que está en pausa. */
+function reanudarVocalActual(entry) {
+  marcarTarjetaVocalPausada(entry.letter, false);
+  resaltarTarjetaVocal(entry.letter, true);
+  mostrarEscenarioVocal(entry);
+  if (audioVocalActivo) audioVocalActivo.play().catch(() => { /* se ignora: seguimos en pausa */ });
 }
 
 /**
@@ -159,6 +189,7 @@ function reproducirAudioVocal(entry) {
       audio.removeEventListener('ended', alTerminar);
       audio.removeEventListener('error', alFallar);
       resaltarTarjetaVocal(entry.letter, false);
+      marcarTarjetaVocalPausada(entry.letter, false);
       ocultarEscenarioVocal();
       if (audioVocalActivo === audio) audioVocalActivo = null;
       if (resolverReproduccionActual === terminar) resolverReproduccionActual = null;
@@ -183,6 +214,20 @@ function reproducirAudioVocal(entry) {
 
 async function cantarUnaVocal(entry) {
   if (cancionVocalesActiva) return; // no interrumpir la canción completa
+
+  const audio = audiosVocales[entry.letter];
+
+  // Es la misma vocal que ya está sonando o en pausa: este toque
+  // alterna entre pausar y reanudar, en vez de arrancar de nuevo.
+  if (audioVocalActivo === audio) {
+    if (audio.paused) {
+      reanudarVocalActual(entry);
+    } else {
+      pausarVocalActual(entry);
+    }
+    return;
+  }
+
   await reproducirAudioVocal(entry);
 }
 
