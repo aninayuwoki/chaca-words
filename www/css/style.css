@@ -399,6 +399,11 @@ main {
   box-shadow: 0 0 0 5px rgba(124, 92, 255, 0.3), 0 10px 18px rgba(43,46,74,0.2);
 }
 
+.vocal-card.pausada {
+  opacity: 0.7;
+  box-shadow: 0 0 0 4px rgba(124, 92, 255, 0.25);
+}
+
 @keyframes rebotar-vocal {
   0%, 100% { transform: translateY(0) scale(1); }
   50% { transform: translateY(-10px) scale(1.08); }
@@ -694,6 +699,28 @@ footer {
   font-size: 0.82rem;
 }
 footer a { color: var(--accent-dark); }
+
+.footer-creditos { margin: 0 0 18px; }
+
+.acerca-de {
+  max-width: 360px;
+  margin: 0 auto;
+  padding: 16px 18px;
+  border-top: 2px dashed #cfd8e8;
+  color: var(--ink-soft);
+}
+
+.acerca-de h2 {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--ink);
+  margin: 0 0 8px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.acerca-de p { margin: 3px 0; line-height: 1.4; }
+.acerca-de .copyright { margin-top: 8px; font-size: 0.78rem; opacity: 0.85; }
 
 /* =========================================================
    RESPONSIVE
